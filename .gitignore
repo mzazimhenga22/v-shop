@@ -1,0 +1,23 @@
+﻿# Secrets
+.env
+backend/.env
+
+# Dependencies
+node_modules/
+venv/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+__pycache__/
+
+# Logs
+*.log
+
+# IDE/OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

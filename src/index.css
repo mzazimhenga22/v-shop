@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  transition: background 0.3s ease;
+}
+
+/* --- Global UI Utilities --- */
+@layer components {
+  .dropdown-link {
+    @apply flex items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors;
+  }
+
+  .glow-button {
+    @apply relative inline-flex items-center justify-center rounded-full font-semibold text-white shadow-lg px-3 py-1 sm:px-4 sm:py-2 text-sm sm:text-base;
+    background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ADEDE, #facc15, #ff6ec4);
+    background-size: 600% 600%;
+  }
+
+  .glow-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    filter: blur(10px);
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  .glow-button > * {
+    position: relative;
+    z-index: 10;
+  }
+
+  .navbar-sticky {
+    @apply sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800;
+  }
+
+  /* 🔥 Realistic Fire Effect */
+  .fire {
+    @apply relative w-[80px] h-[150px] overflow-hidden flex-shrink-0;
+  }
+
+  .flame {
+    @apply absolute bottom-0 opacity-80;
+    left: 50%;
+    width: 24px;
+    height: 60px;
+    background: linear-gradient(to top, #ff4500, #ffa500, #ffff00);
+    transform: translateX(-50%) scale(1);
+    animation: burn 1.5s infinite ease-in-out;
+    clip-path: polygon(50% 0%, 100% 40%, 80% 100%, 20% 100%, 0% 40%);
+  }
+
+  .flame:nth-child(2) {
+    animation-delay: 0.3s;
+    left: 40%;
+    width: 20px;
+    height: 50px;
+    background: linear-gradient(to top, #ff6347, #ffb347, #ffff00);
+    transform: translateX(-40%) scale(0.9);
+    clip-path: polygon(50% 0%, 90% 30%, 70% 100%, 30% 100%, 10% 30%);
+  }
+
+  .flame:nth-child(3) {
+    animation-delay: 0.6s;
+    left: 60%;
+    width: 16px;
+    height: 48px;
+    background: linear-gradient(to top, #ffff00, #ff6347, #ff0000);
+    transform: translateX(-60%) scale(0.8);
+    clip-path: polygon(50% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+  }
+
+  .flame:nth-child(4) {
+    animation-delay: 0.9s;
+    left: 45%;
+    width: 28px;
+    height: 64px;
+    background: linear-gradient(to top, #ff0000, #ff6347, #ffa500);
+    transform: translateX(-45%) scale(1.1);
+    clip-path: polygon(50% 0%, 95% 40%, 80% 100%, 20% 100%, 5% 40%);
+  }
+
+  .flame:nth-child(5) {
+    animation-delay: 1.2s;
+    left: 55%;
+    width: 22px;
+    height: 52px;
+    background: linear-gradient(to top, #ffa500, #ffff00, #ffffff);
+    transform: translateX(-55%) scale(0.95);
+    clip-path: polygon(50% 0%, 100% 35%, 85% 100%, 15% 100%, 0% 35%);
+  }
+
+  /* Glow effect for fire */
+  .fire::before {
+    content: "";
+    @apply absolute bottom-0 left-0 w-full h-[64px];
+    background: radial-gradient(circle at 50% 100%, #ff4500 20%, transparent 60%);
+    opacity: 0.4;
+    filter: blur(12px);
+  }
+
+  /* Sparks for extra realism */
+  .spark {
+    @apply absolute rounded-full bg-yellow-200 opacity-50;
+    width: 2px;
+    height: 2px;
+    animation: spark 2s infinite ease-in-out;
+  }
+
+  .spark:nth-child(6) {
+    animation-delay: 0.5s;
+    left: 30%;
+    top: 10%;
+  }
+
+  .spark:nth-child(7) {
+    animation-delay: 1s;
+    left: 70%;
+    top: 20%;
+  }
+}
+
+/* --- Pulse Glow Animation --- */
+@keyframes ai-pulse {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+
+.animate-ai-pulse {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.animate-ai-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ADEDE, #facc15, #ff6ec4);
+  background-size: 600% 600%;
+  filter: blur(10px);
+  opacity: 0.35;
+  animation: ai-pulse 3s ease-in-out infinite;
+  z-index: 0;
+}
+
+/* 🔥 Keyframes for fire animation */
+@keyframes burn {
+  0% {
+    transform: translateX(-50%) scale(1) translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2) translateY(-8px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(1) translateY(0);
+    opacity: 0.7;
+  }
+}
+
+/* Keyframes for sparks */
+@keyframes spark {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-40px) scale(0.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-80px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* --- Hide scrollbar (cross-browser) --- */
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    width: 0;                  /* Chrome/Safari/Opera */
+    height: 0;
+    display: none;
+    background: transparent;
+  }
+
+  /* alias for any places using `scrollbar-hide` */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+    background: transparent;
+  }
+}
