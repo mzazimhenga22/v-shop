@@ -79,24 +79,37 @@ const Footer = () => {
 
           <p className="text-xs text-gray-500">Subscribe for new arrivals, special offers, and insider deals.</p>
 
-          <form onSubmit={handleSubscribe} className="mt-2 w-full flex gap-2">
-            <label htmlFor="footer-email" className="sr-only">Email address</label>
-            <input
-              id="footer-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-800/40 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            />
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-60 transition"
-            >
-              {status === "loading" ? "Saving..." : status === "success" ? "Done" : "Subscribe"}
-            </button>
-          </form>
+          <form
+  onSubmit={handleSubscribe}
+  className="mt-2 w-full flex flex-col sm:flex-row gap-2"
+>
+  <label htmlFor="footer-email" className="sr-only">
+    Email address
+  </label>
+  <input
+    id="footer-email"
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    placeholder="Enter your email"
+    className="w-full sm:flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 
+               bg-white/60 dark:bg-gray-800/40 placeholder-gray-400 text-sm 
+               focus:outline-none focus:ring-2 focus:ring-emerald-400"
+  />
+  <button
+    type="submit"
+    disabled={status === "loading"}
+    className="w-full sm:w-auto px-3 py-2 rounded-lg bg-emerald-600 text-white 
+               text-sm font-medium hover:bg-emerald-700 disabled:opacity-60 transition"
+  >
+    {status === "loading"
+      ? "Saving..."
+      : status === "success"
+      ? "Done"
+      : "Subscribe"}
+  </button>
+</form>
+
 
           <div className="flex items-center gap-3 mt-3">
             <a href="#" aria-label="Facebook" className="p-2 rounded-md bg-white/10 hover:bg-white/20 transition">

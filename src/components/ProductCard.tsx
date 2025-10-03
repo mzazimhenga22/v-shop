@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { saveToRecentlyViewed } from "@/utils/recent";
 import type { Product } from "@/types";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useCart, type CartItem } from "@/context/CartContext";
 
 /* --- helper to compute discounted price --- */
 function parseSaleAndCompute(price: number, saleRaw?: any) {
@@ -141,6 +142,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, onAddToCart, onBuyNow }) => {
   const navigate = useNavigate();
   const { formatCurrency } = useCurrency();
+  const { addToCart } = useCart();
 
   const priceNum = Number(product.price ?? 0) || 0;
 
@@ -169,6 +171,35 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, on
       });
     } catch {}
     navigate("/product", { state: { product } });
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Build a CartItem compatible object
+    const cartItem: CartItem = {
+      id: String(product.id ?? product.sku ?? product.slug ?? `p-${Math.random().toString(36).slice(2)}`),
+      name: product.name ?? "Product",
+      price: Number(finalPrice ?? priceNum ?? 0),
+      quantity: 1,
+      image: product.image ?? null,
+      product_id: product.id,
+      // keep variant/vendor/payment fields absent unless provided
+    };
+
+    try {
+      addToCart(cartItem);
+    } catch (err) {
+      // In case the component is used outside of CartProvider, avoid crashing.
+      // You might want to surface a toast here in real app.
+      // console.warn("addToCart failed (no CartProvider?):", err);
+    }
+
+    // call optional prop callback (keeps backwards compat)
+    if (onAddToCart) {
+      try {
+        onAddToCart();
+      } catch {}
+    }
   };
 
   return (
@@ -284,18 +315,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, on
       </div>
 
       <div className="flex gap-2 mt-2">
-        {onAddToCart && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart();
-            }}
-            className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-            aria-label="Add to cart"
-          >
-            Add to cart
-          </button>
-        )}
+        <button
+          onClick={handleAddToCart}
+          className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+          aria-label="Add to cart"
+        >
+          Add to cart
+        </button>
+
         {onBuyNow && (
           <button
             onClick={(e) => {
