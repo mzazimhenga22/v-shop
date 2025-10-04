@@ -159,6 +159,7 @@ const tryImport = async (modPath: string) => {
     { path: "/admin", module: "./routes/admin" },
     { path: "/promote", module: "./routes/promote" },
     { path: "/orders", module: "./routes/orders" },
+    { path: "/api", module: "./routes/mergedProducts" }, 
     { path: "/api/products", module: "./api/products" },
     { path: "/api/categories", module: "./api/categories" },
     { path: "/api/vendors", module: "./routes/vendorsapp" },

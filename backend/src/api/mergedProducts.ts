@@ -2,7 +2,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import { v4 as uuid } from "uuid";
-import { supabase } from "../supabaseClient.js";// adjust path if needed
+import { supabase } from "../supabaseClient.js"; // adjust path if needed
 
 // extend Request to carry user from auth middleware
 declare global {
@@ -269,10 +269,12 @@ export const authMiddleware = async (req: Request & { user?: any }, res: Respons
     return res.status(500).json({ error: "Auth middleware failed", details: err });
   }
 };
+
 // -----------------------------
-// VENDOR: GET /vendor/products (auth-protected)
+// VENDOR-SCOPED: GET /products (auth-protected; returns products for current vendor)
+// Note: this used to be /vendor/products; we removed the redundant /vendor prefix
 // -----------------------------
-router.get("/vendor/products", authMiddleware, async (req: Request & { user?: any }, res: Response) => {
+router.get("/products", authMiddleware, async (req: Request & { user?: any }, res: Response) => {
   try {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "Unauthorized" });
@@ -292,16 +294,16 @@ router.get("/vendor/products", authMiddleware, async (req: Request & { user?: an
     const normalized = products.map((row: any) => ({ ...row, payment_methods: normalizePaymentMethodsForResponse(row.payment_methods) }));
     return res.status(200).json({ products: normalized, debug: { tableResults } });
   } catch (err: any) {
-    console.error("Error in GET /vendor/products:", err);
+    console.error("Error in GET /products (vendor):", err);
     return res.status(500).json({ error: err?.message || "Unknown server error" });
   }
 });
 
 // -----------------------------
-// VENDOR: POST /vendor/products (create)
+// VENDOR-SCOPED: POST /products (create) - removed /vendor prefix
 // -----------------------------
 router.post(
-  "/vendor/products",
+  "/products",
   authMiddleware,
   upload.fields([
     { name: "image", maxCount: 1 },
@@ -547,10 +549,11 @@ router.post(
 );
 
 // -----------------------------
-// VENDOR: PUT /vendor/products/:id (update) - ownership enforced
+// VENDOR-SCOPED: PUT /products/:id (update) - ownership enforced
+// removed /vendor prefix
 // -----------------------------
 router.put(
-  "/vendor/products/:id",
+  "/products/:id",
   authMiddleware,
   upload.fields([
     { name: "image", maxCount: 1 },
@@ -679,10 +682,11 @@ router.put(
 );
 
 // -----------------------------
-// VENDOR: POST /vendor/profiles (create/update profile with photo/banner)
+// VENDOR-SCOPED: POST /profiles (create/update profile with photo/banner)
+// removed /vendor prefix
 // -----------------------------
 router.post(
-  "/vendor/profiles",
+  "/profiles",
   authMiddleware,
   upload.fields([
     { name: "photo", maxCount: 1 },
@@ -749,9 +753,10 @@ router.post(
 );
 
 // -----------------------------
-// VENDOR: DELETE /vendor/products/:id
+// VENDOR-SCOPED: DELETE /products/:id
+// removed /vendor prefix
 // -----------------------------
-router.delete("/vendor/products/:id", authMiddleware, async (req: Request & { user?: any }, res: Response) => {
+router.delete("/products/:id", authMiddleware, async (req: Request & { user?: any }, res: Response) => {
   try {
     const { id } = req.params;
     const user = req.user;
@@ -806,6 +811,7 @@ router.delete("/vendor/products/:id", authMiddleware, async (req: Request & { us
 
 // -----------------------------
 // PUBLIC: GET /vendors/:vendorId/products
+// (unchanged - public vendor listing by vendorId)
 // -----------------------------
 router.get("/vendors/:vendorId/products", async (req: Request, res: Response) => {
   const { vendorId } = req.params;
@@ -870,7 +876,7 @@ router.post("/validate-vendors", async (req: Request, res: Response) => {
 });
 
 // -----------------------------
-// PUBLIC: GET /vendors/:id
+// PUBLIC: GET /vendors/:id (vendor lookup - unchanged)
 // -----------------------------
 router.get("/vendors/:id", async (req: Request, res: Response) => {
   try {
@@ -907,6 +913,7 @@ router.get("/vendors/:id", async (req: Request, res: Response) => {
 
 // -----------------------------
 // ADMIN: GET / (all products from 'products' table preferred)
+// NOTE: This remains GET '/' - if you prefer explicit '/products' change the mount accordingly.
 // -----------------------------
 router.get("/", async (_, res: Response) => {
   try {
@@ -921,6 +928,7 @@ router.get("/", async (_, res: Response) => {
 
 // -----------------------------
 // ADMIN: POST / (create product with admin/vendor handling)
+// NOTE: remains POST '/' for admin create; keep mount conventions consistent in your app.
 // -----------------------------
 router.post(
   "/",
@@ -1177,8 +1185,8 @@ router.post(
 
 // -----------------------------
 // ADMIN: GET /search?category=foo
-// -----------------------------
 // Keep search before the dynamic :id routes
+// -----------------------------
 router.get("/search", async (req: Request, res: Response) => {
   try {
     const category = String(req.query.category ?? "").trim();
@@ -1273,6 +1281,8 @@ router.get("/search", async (req: Request, res: Response) => {
 
 // -----------------------------
 // ADMIN: GET /:id (product by ID w/ fallback across tables)
+// NOTE: preserved as product lookup but now scoped to products via earlier endpoints,
+// if you'd prefer make this /products/:id — keep mount-consistency in app.ts
 // -----------------------------
 router.get("/:id", async (req: Request, res: Response) => {
   try {
@@ -1639,9 +1649,6 @@ router.delete("/vendors/:id", authMiddleware, async (req: Request & { user?: any
 
 // -----------------------------
 // ADMIN/VENDOR: PATCH /vendors/:id/demote  (soft-demote / remove vendor flags)
-// - Admins may demote anyone.
-// - A vendor may demote themselves (self-service).
-// - The handler attempts to update common vendor fields across candidate tables, ignoring missing columns.
 // -----------------------------
 router.patch("/vendors/:id/demote", authMiddleware, async (req: Request & { user?: any }, res: Response) => {
   try {
@@ -1708,6 +1715,5 @@ router.patch("/vendors/:id/demote", authMiddleware, async (req: Request & { user
     return res.status(500).json({ error: err?.message || "Server error", details: err });
   }
 });
-
 
 export default router;
